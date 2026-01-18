@@ -1,0 +1,27 @@
+name: squeeze-plex-hub-tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.34'
+
+      - name: Install dependencies
+        run: |
+          cpanm --installdeps --notest .
+
+      - name: Run tests
+        env:
+          PERL5LIB: t/lib:.
+        run: |
+          prove -lr t

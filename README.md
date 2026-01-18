@@ -37,6 +37,13 @@ While optional, this plugin is strongly recommended when using the [Squeeze Plex
 
 ## 🧑‍💻 Local Development
 
+### Unit Testing
+From repo root:
+```bash
+cpanm --installdeps --notest .
+prove -lr t
+```
+
 ### macOS (LMS Package)
 
 Install the Lyrion Music Server DMG for macOS, then symlink the plugin into LMS:
