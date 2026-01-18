@@ -6,6 +6,7 @@ package Plugins::SqueezePlexHub::ProtocolHandler;
 use strict;
 
 use base qw(Slim::Formats::RemoteStream);
+use Slim::Networking::SimpleAsyncHTTP;
 
 use URI;
 use XML::Simple qw(XMLin);
