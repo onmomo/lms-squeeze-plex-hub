@@ -1,9 +1,10 @@
 package Plugins::SqueezePlexHub::ProtocolHandler;
 
+# Protocol handler for URLs with squeezePlexHub_rk: returns cleaned playable URL and asynchronously fetches Plex metadata.
+# Parses Plex XML, caches metadata, sets LMS remote metadata and updates playlist item (artwork, album/track info).
+
 use strict;
 
-# Keep squeezePlexHub_rk in the playlist URL for metadata lookup,
-# but strip it for the actual stream request.
 use base qw(Slim::Formats::RemoteStream);
 
 use URI;
@@ -49,24 +50,67 @@ sub explodePlaylist {
     # Important: use the clean URL without our rk param in order to skip this protocol handler for the actual playback
     $cb->( [$url_clean] );
 
-    # Async fetch metadata to update current track info
+    my $base  = $url_res->{base} || '';
+    my $rk    = $url_res->{rk};
+    my $token = $url_res->{token};
+
+    # Not enough info to fetch metadata
+    return unless $base && $rk;
+
+    # Cache key per Plex track
+    my $metaKey = "sph_meta_${base}_${rk}";
+
+    # Serve cached metadata if available
+    if ( my $cached = $cache->get($metaKey) ) {
+        if ( ref($cached) eq 'HASH' ) {
+            $log->info("SPH: serving cached metadata for rk=$rk, title='"
+                  . ( $cached->{title} || '' ) . "'" );
+            Slim::Music::Info::setRemoteMetadata( $url_clean, $cached );
+
+            eval {
+                $client->currentPlaylistUpdateTime( Time::HiRes::time() )
+                  if $client;
+                Slim::Control::Request::notifyFromArray( $client,
+                    ['newmetadata'] )
+                  if $client;
+                1;
+            };
+
+            return;
+        }
+    }
+
+    # Fetch metadata async
     _fetch_plex_track_metadata(
         sub {
             my ($m) = @_;
             return unless $m && ref($m) eq 'HASH';
 
+            # setRemoteMetadata supports only certain fields
             my $meta = {
-                # TODO check if we can also add artist and album
-                title => $m->{title} || '',
-                year  => $m->{year}  || '',
+                title => _compose_title($m),
+
+                # seems to have no effect
+                year => $m->{year} || '',
+
                 # duration must be in "secs" (seconds, or hh:mm:ss string)
-                secs => $m->{duration} || 0,                            
+                secs => $m->{duration} || 0,
+
                 # artwork URL
-                cover => $m->{cover} || $m->{icon},
-            }; 
-        
-            # TODO consider caching per URL to avoid redundant fetches            
+                cover => $m->{cover} || $m->{icon}
+            };
+
+            # Cache final LMS metadata
+            $cache->set( $metaKey, $meta, 1800 )
+              ;    # TTL: 0.5 hours (tune as needed)
+
             Slim::Music::Info::setRemoteMetadata( $url_clean, $meta );
+
+            # May the LMS gods forgive me for this ... 🙏
+            setMetadataForPlaylistItem(
+                $url_clean,     $m->{album}, $m->{disc},
+                $m->{tracknum}, $m->{year},  $m->{genre}
+            );
 
             eval {
                 $client->currentPlaylistUpdateTime( Time::HiRes::time() )
@@ -77,10 +121,51 @@ sub explodePlaylist {
                 1;
             };
         },
-        $url_res->{base},
-        $url_res->{token},
-        $url_res->{rk}
+        $base,
+        $token,
+        $rk
     );
+}
+
+sub setMetadataForPlaylistItem {
+    my ( $url, $album_name, $disc_number, $track_number, $year, $genre ) = @_;
+
+    my $track = Slim::Schema->updateOrCreate(
+        {
+            url        => $url,
+            attributes => {
+                ALBUM    => $album_name,
+                TRACKNUM => $track_number,
+                DISC     => $disc_number,
+                YEAR     => $year,
+                GENRE    => $genre                
+            },
+            readTags => 0,
+            commit   => 1
+        }
+    );
+
+    return $track;
+}
+
+# Compose a display title from artist, title, album
+sub _compose_title {
+    my ($m) = @_;
+
+    my $artist = $m->{artist};
+    my $title  = $m->{title} || '';
+
+    my $t = '';
+
+    if ( $artist && $title ) {
+        $t = "$artist - $title";
+    }
+    else {
+        $t = $title;
+    }
+
+    $log->debug("SPH: composed title: '$t'");
+    return $t;
 }
 
 sub _parse_stream_url {
@@ -117,6 +202,11 @@ sub _fetch_plex_track_metadata {
     if ( $token && $metaUrl !~ /X-Plex-Token=/i ) {
         $metaUrl .= ( $metaUrl =~ /\?/ ? '&' : '?' ) . 'X-Plex-Token=' . $token;
     }
+
+    # Mask token in log output
+    my $metaUrlLog = $metaUrl;
+    $metaUrlLog =~ s/(X-Plex-Token=)[^&]+/${1}REDACTED/ig;
+    $log->debug("SPH: fetching Plex metadata from URL: $metaUrlLog");
 
     my $http = Slim::Networking::SimpleAsyncHTTP->new(
         sub {
@@ -156,8 +246,7 @@ sub _fetch_plex_track_metadata {
             my $year = '';
             if ( defined $track->{parentYear} ) {
                 $year = $track->{parentYear};
-            }            
-
+            }
             elsif ( defined $track->{year} ) {
                 $year = $track->{year};
             }
@@ -178,7 +267,33 @@ sub _fetch_plex_track_metadata {
                 }
             }
 
-            $log->debug("SPH: fetched Plex metadata for rk=$rk: title='$title', artist='$artist', album='$album', year='$year', duration=$duration, tracknum='$tracknum', disc='$disc', icon='$icon'");
+            my $trackMedia =
+              ( $track->{Media}
+                  && ref( $track->{Media} ) eq 'ARRAY'
+                  && @{ $track->{Media} } )
+              ? $track->{Media}[0]
+              : undef;
+
+            # Parse first Genre tag="..."
+            my $genre = '';
+            if ( $track->{Genre}
+                && ref( $track->{Genre} ) eq 'ARRAY'
+                && @{ $track->{Genre} } )
+            {
+                my $g0 = $track->{Genre}[0];
+                if ( ref($g0) eq 'HASH' && defined $g0->{tag} ) {
+                    $genre = $g0->{tag} || '';
+                }
+            }
+
+            # Mask token in icon for logs
+            my $iconLog = $icon || '';
+            $iconLog =~ s/(X-Plex-Token=)[^&]+/${1}REDACTED/ig;
+
+            $log->debug( "SPH: fetched Plex metadata for rk=$rk: "
+                  . "title='$title', artist='$artist', album='$album', "
+                  . "year='$year', duration=$duration, tracknum='$tracknum', disc='$disc', "
+                  . "genre='$genre', icon='$iconLog'" );
 
             $cb->(
                 {
@@ -189,8 +304,9 @@ sub _fetch_plex_track_metadata {
                     duration => $duration,
                     tracknum => $tracknum,
                     disc     => $disc,
+                    genre    => $genre,
                     icon     => $icon,
-                    cover    => $icon                    
+                    cover    => $icon,
                 }
             );
         },
