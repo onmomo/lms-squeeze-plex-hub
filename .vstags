@@ -1,0 +1,26 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+Plugins::SqueezePlexHub::Plugin	SqueezePlexHub/Plugin.pm	1;"	p
+Plugins::SqueezePlexHub::Plugin::getDisplayName	SqueezePlexHub/Plugin.pm	31;"	s
+Plugins::SqueezePlexHub::Plugin::initPlugin	SqueezePlexHub/Plugin.pm	22;"	s
+Plugins::SqueezePlexHub::ProtocolHandler	SqueezePlexHub/ProtocolHandler.pm	1;"	p
+Plugins::SqueezePlexHub::ProtocolHandler::SPH_URL_REGEXP	SqueezePlexHub/ProtocolHandler.pm	21;"	c
+Plugins::SqueezePlexHub::ProtocolHandler::_fetch_plex_track_metadata	SqueezePlexHub/ProtocolHandler.pm	113;"	s
+Plugins::SqueezePlexHub::ProtocolHandler::_parse_stream_url	SqueezePlexHub/ProtocolHandler.pm	86;"	s
+Plugins::SqueezePlexHub::ProtocolHandler::canDirectStream	SqueezePlexHub/ProtocolHandler.pm	27;"	s
+Plugins::SqueezePlexHub::ProtocolHandler::contentType	SqueezePlexHub/ProtocolHandler.pm	26;"	s
+Plugins::SqueezePlexHub::ProtocolHandler::explodePlaylist	SqueezePlexHub/ProtocolHandler.pm	35;"	s
+Plugins::SqueezePlexHub::ProtocolHandler::requestString	SqueezePlexHub/ProtocolHandler.pm	29;"	s
+SPH_URL_REGEXP	SqueezePlexHub/ProtocolHandler.pm	21;"	c
+_fetch_plex_track_metadata	SqueezePlexHub/ProtocolHandler.pm	113;"	s
+_parse_stream_url	SqueezePlexHub/ProtocolHandler.pm	86;"	s
+canDirectStream	SqueezePlexHub/ProtocolHandler.pm	27;"	s
+contentType	SqueezePlexHub/ProtocolHandler.pm	26;"	s
+explodePlaylist	SqueezePlexHub/ProtocolHandler.pm	35;"	s
+getDisplayName	SqueezePlexHub/Plugin.pm	31;"	s
+initPlugin	SqueezePlexHub/Plugin.pm	22;"	s
+requestString	SqueezePlexHub/ProtocolHandler.pm	29;"	s
