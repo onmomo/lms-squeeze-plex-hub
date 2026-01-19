@@ -24,11 +24,11 @@ jobs:
 
       - name: Generate coverage report
         run: |            
-          cover -report codecov -select SqueezePlexHub::ProtocolHandler
+          cover -test -report codecov
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}  
-         
+          directory: ./cover_db
         
