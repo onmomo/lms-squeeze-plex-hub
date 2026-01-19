@@ -14,8 +14,10 @@ require Slim::Schema;    # forces stub load now
 
 # Load the module from the repo layout:
 require SqueezePlexHub::ProtocolHandler;
+
 # path fix for MockModule
-$INC{'Plugins/SqueezePlexHub/ProtocolHandler.pm'} = 'SqueezePlexHub/ProtocolHandler.pm';
+$INC{'Plugins/SqueezePlexHub/ProtocolHandler.pm'} =
+  'SqueezePlexHub/ProtocolHandler.pm';
 
 sub reset_state {
     Slim::Music::Info::reset_calls();
@@ -98,7 +100,8 @@ sub reset_state {
     my $res = Plugins::SqueezePlexHub::ProtocolHandler::_parse_stream_url($uri);
     my $key = "sph_meta_$res->{base}_$res->{rk}";
 
-    my $mock = Test::MockModule->new('Plugins::SqueezePlexHub::ProtocolHandler');
+    my $mock =
+      Test::MockModule->new('Plugins::SqueezePlexHub::ProtocolHandler');
     $mock->redefine(
         '_fetch_plex_track_metadata' => sub { die "fetch should not be called" }
     );
@@ -138,7 +141,8 @@ sub reset_state {
     my $uri =
 'http://pms:32400/library/parts/1/file.flac?X-Plex-Token=abc&squeezePlexHub_rk=57038';
 
-    my $mock = Test::MockModule->new('Plugins::SqueezePlexHub::ProtocolHandler');
+    my $mock =
+      Test::MockModule->new('Plugins::SqueezePlexHub::ProtocolHandler');
     $mock->redefine(
         '_fetch_plex_track_metadata' => sub {
             my ( $cb, $base, $token, $rk ) = @_;
