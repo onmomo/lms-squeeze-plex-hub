@@ -18,13 +18,8 @@ jobs:
       - name: Run tests with coverage
         env:
           PERL5LIB: t/lib:.
-          PERL5OPT: -MDevel::Cover
-        run: |
-          prove -lr t
-
-      - name: Generate coverage report
         run: |            
-          cover -report lcov
+          cover -test -ignore ^t/lib/$
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
