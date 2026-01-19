@@ -24,7 +24,7 @@ jobs:
 
       - name: Generate coverage report
         run: |            
-          cover -test -report codecov
+          cover -test -report html -output cover_db
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
