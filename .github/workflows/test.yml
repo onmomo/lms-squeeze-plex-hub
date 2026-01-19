@@ -18,6 +18,7 @@ jobs:
       - name: Run tests with coverage
         env:
           PERL5LIB: t/lib:.
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |            
           cover -test -report codecov -ignore ^t/lib/$
 
