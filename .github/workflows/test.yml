@@ -1,4 +1,4 @@
-name: squeeze-plex-hub-tests
+name: lms-squeeze-plex-hub-plugin-tests
 
 on:
   push:
@@ -7,14 +7,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
+    container: perl:5.34
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Perl
-        uses: shogo82148/actions-setup-perl@v1
-        with:
-          perl-version: "5.34"
 
       - name: Install dependencies
         run: |
@@ -28,7 +23,7 @@ jobs:
           prove -lr t
 
       - name: Generate coverage report
-        run: |
+        run: |            
           cover -report codecov -select SqueezePlexHub::ProtocolHandler
 
       - name: Upload coverage to Codecov
