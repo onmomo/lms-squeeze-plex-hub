@@ -14,14 +14,28 @@ jobs:
       - name: Set up Perl
         uses: shogo82148/actions-setup-perl@v1
         with:
-          perl-version: '5.34'
+          perl-version: "5.34"
 
       - name: Install dependencies
         run: |
           cpanm --installdeps --notest .
 
-      - name: Run tests
+      - name: Run tests with coverage
         env:
           PERL5LIB: t/lib:.
+          PERL5OPT: -MDevel::Cover
         run: |
           prove -lr t
+
+      - name: Generate coverage report
+        run: |
+          cover -report codecov -select SqueezePlexHub::ProtocolHandler
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          directory: cover_db
+          flags: perl
+          token: ${{ secrets.CODECOV_TOKEN }}  
+         
+        
