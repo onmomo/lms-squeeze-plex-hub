@@ -47,8 +47,8 @@ sub explodePlaylist {
         return;
     }
 
-    # Always return the playable URL immediately
-    # Important: use the clean URL without our rk param in order to skip this protocol handler for the actual playback
+# Always return the playable URL immediately
+# Important: use the clean URL without our rk param in order to skip this protocol handler for the actual playback
     $cb->( [$url_clean] );
 
     my $base  = $url_res->{base} || '';
@@ -64,8 +64,9 @@ sub explodePlaylist {
     # Serve cached metadata if available
     if ( my $cached = $cache->get($metaKey) ) {
         if ( ref($cached) eq 'HASH' ) {
-            $log->info("SPH: serving cached metadata for rk=$rk, title='"
-                  . ( $cached->{title} || '' ) . "'" );
+            $log->info( "SPH: serving cached metadata for rk=$rk, title='"
+                  . ( $cached->{title} || '' )
+                  . "'" );
             Slim::Music::Info::setRemoteMetadata( $url_clean, $cached );
 
             eval {
@@ -139,7 +140,7 @@ sub setMetadataForPlaylistItem {
                 TRACKNUM => $track_number,
                 DISC     => $disc_number,
                 YEAR     => $year,
-                GENRE    => $genre                
+                GENRE    => $genre
             },
             readTags => 0,
             commit   => 1
@@ -269,7 +270,7 @@ sub _fetch_plex_track_metadata {
             }
 
             my $trackMedia =
-              ( $track->{Media}
+              (      $track->{Media}
                   && ref( $track->{Media} ) eq 'ARRAY'
                   && @{ $track->{Media} } )
               ? $track->{Media}[0]
@@ -277,7 +278,7 @@ sub _fetch_plex_track_metadata {
 
             # Parse first Genre tag="..."
             my $genre = '';
-            if ( $track->{Genre}
+            if (   $track->{Genre}
                 && ref( $track->{Genre} ) eq 'ARRAY'
                 && @{ $track->{Genre} } )
             {
