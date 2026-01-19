@@ -19,7 +19,7 @@ jobs:
         env:
           PERL5LIB: t/lib:.
         run: |            
-          cover -test -report GithubActions -ignore ^t/lib/$
+          cover -test -report codecov -ignore ^t/lib/$
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
