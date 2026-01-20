@@ -7,7 +7,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: perl:latest
+    container: perl:5
     steps:
       - uses: actions/checkout@v4
 
@@ -24,7 +24,7 @@ jobs:
 
       - name: Generate coverage report
         run: |            
-          cover -report clover -ignore ^t/lib/$
+          cover -report clover -ignore '^t/'
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
