@@ -1,9 +1,7 @@
 requires 'URI';
 requires 'XML::Simple';
 requires 'Devel::Cover';
-requires 'JSON::MaybeXS';
-requires 'Devel::Cover::Report::Json';
-requires 'Devel::Cover::Report::Codecov';
+requires 'devel-cover-coverage-cobertura';
 
 on 'test' => sub {
   requires 'Test::More';
