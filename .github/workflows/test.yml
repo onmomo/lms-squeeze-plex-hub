@@ -20,7 +20,14 @@ jobs:
           PERL5LIB: t/lib:.
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |            
-          cover -test -report json -ignore ^t/lib/$
+          prove -lr t
+
+      - name: Generate coverage report
+        env:
+          PERL5LIB: t/lib:.
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: |            
+          cover -report json -ignore ^t/lib/$
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
