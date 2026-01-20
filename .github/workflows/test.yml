@@ -24,7 +24,7 @@ jobs:
 
       - name: Generate coverage report
         run: |            
-          cover -report clover -select "^SqueezePlexHub/*.pm"
+          cover -report clover +select SqueezePlexHub/ -ignore '^t/'
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
