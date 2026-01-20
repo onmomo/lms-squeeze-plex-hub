@@ -100,27 +100,23 @@ Native Linux Docker is recommended for best results.
 
 ## 🧠 How It Works
 
-Squeeze Plex Hub injects tracks into LMS
+Squeeze Plex Hub loads tracks into LMS playlist
 The plugin detects those tracks
 Metadata is fetched from Plex Media Server
 LMS is updated in real-time with enriched metadata
 
-## 🛠 Status
-
-Actively developed
-Stable for daily use
-Open to improvements and contributions
-
 ## 🤝 Contributing
 
 Pull requests, bug reports, and feature ideas are welcome.
-If you enjoy extending LMS, Plex, or legacy Squeezebox hardware — contributions are appreciated.
+If you enjoy extending LMS, Plex, or using legacy Squeezebox hardware with Plex — contributions or sponsorships are appreciated.
+
+👉 [GitHub Sponsors](https://github.com/sponsors/onmomo)
 
 ## 📄 License
 
-MIT
+This project is licensed under the MIT License.
 
 ## ⚠️ Disclaimer
 
-This project is not affiliated with or endorsed by Plex, Logitech, or Lyrion.
-All trademarks belong to their respective owners.
+**LMS Squeeze Plex Hub Plugin** is an independent, open source project and is **not affiliated with, endorsed by, or officially supported by Plex, Plexamp, Logitech, or Slim Devices**.  
+All product names and trademarks are the property of their respective owners.
