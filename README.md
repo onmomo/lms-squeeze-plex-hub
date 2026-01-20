@@ -1,6 +1,6 @@
 <div align="center">
 
-<img alt="LMS Squeeze Plex Hub Plugin" src="assets/logo.png" width="400"/>
+<img alt="LMS Squeeze Plex Hub Plugin" src="SqueezePlexHub/HTML/EN/plugins/SqueezePlexHub/html/images/logo.png" width="400"/>
 <h3>Plugin to show original Plex track metadata in LMS when using Squeeze Plex Hub</h3>
 
 <p>

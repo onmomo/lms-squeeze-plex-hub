@@ -13,7 +13,7 @@ use Plugins::SqueezePlexHub::ProtocolHandler;
 my $log = Slim::Utils::Log->addLogCategory(
     {
         'category'     => 'plugin.squeezeplexhub',
-        'defaultLevel' => 'INFO',
+        'defaultLevel' => 'WARN',
         'description'  => 'PLUGIN_SQUEEZEPLEXHUB'
     }
 );
