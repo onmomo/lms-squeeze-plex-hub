@@ -23,8 +23,10 @@ jobs:
           prove -lr t
 
       - name: Generate coverage report
+        env:
+          PERL5OPT: -MDevel::Cover=-ignore,"t/",+ignore,"prove"
         run: |            
-          cover -report clover +ignore "^t/" +ignore "t/" +ignore "/t\b"
+          cover -report clover
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
