@@ -24,7 +24,7 @@ jobs:
 
       - name: Generate coverage report
         run: |            
-          cover -report cobertura -ignore ^t/lib/$
+          cover -report clover -ignore ^t/lib/$
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
