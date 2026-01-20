@@ -1,0 +1,5 @@
+PLUGIN_SQUEEZEPLEXHUB
+	EN	Squeeze Plex Hub
+    
+PLUGIN_SQUEEZEPLEXHUB_DESCRIPTION
+	EN	A Lyrion Music Server plugin that bridges Plex metadata into LMS when tracks are streamed through the Squeeze Plex Hub application.
