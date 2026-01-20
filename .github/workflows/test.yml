@@ -18,7 +18,7 @@ jobs:
       - name: Run tests with coverage
         env:
           PERL5LIB: t/lib:.
-          PERL5OPT: -MDevel::Cover=-ignore,"t/",+ignore,"prove"
+          PERL5OPT: -MDevel::Cover="-ignore,^t/"
         run: |
           prove -lr t
 
