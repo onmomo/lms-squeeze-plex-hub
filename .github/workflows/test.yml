@@ -18,19 +18,16 @@ jobs:
       - name: Run tests with coverage
         env:
           PERL5LIB: t/lib:.
-          PERL5OPT: -MDevel::Cover                    
-        run: |            
+          PERL5OPT: -MDevel::Cover=-ignore,"t/",+ignore,"prove"
+        run: |
           prove -lr t
 
       - name: Generate coverage report
-        env:
-          PERL5OPT: -MDevel::Cover=-ignore,"t/",+ignore,"prove"
-        run: |            
+        run: |
           cover -report clover
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}  
+          token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./cover_db
-        
