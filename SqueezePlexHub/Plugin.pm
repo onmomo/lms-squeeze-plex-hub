@@ -28,6 +28,6 @@ sub initPlugin {
     return 1;
 }
 
-sub getDisplayName { 'SqueezePlexHub' }
+sub getDisplayName { 'PLUGIN_SQUEEZEPLEXHUB' }
 
 1;
