@@ -24,7 +24,7 @@ jobs:
 
       - name: Generate coverage report
         run: |            
-          cover -report clover -ignore_re "^t/" -ignore "^t/"
+          cover -report clover +ignore_re "^t/" +ignore "^t/"
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
