@@ -34,7 +34,8 @@ sub explodePlaylist {
 
     unless ( defined $url_clean && $url_clean ne '' ) {
         $log->error(
-            "Transform URL for playlist items failed: clean URL is empty, returning original URI");
+"Transform URL for playlist items failed: clean URL is empty, returning original URI"
+        );
         $cb->( [$uri] );
         return;
     }
@@ -52,73 +53,70 @@ sub explodePlaylist {
 
     # Cache key per Plex track
     my $metaKey = "sph_meta_${base}_${rk}";
-
-    # Serve cached metadata if available
     if ( my $cached = $cache->get($metaKey) ) {
+
+        # Serve cached metadata if available
         if ( ref($cached) eq 'HASH' ) {
             $log->info( "Serving cached metadata for rk=$rk, title='"
                   . ( $cached->{title} || '' )
                   . "'" );
             Slim::Music::Info::setRemoteMetadata( $url_clean, $cached );
 
-            eval {
-                $client->currentPlaylistUpdateTime( Time::HiRes::time() )
-                  if $client;
-                Slim::Control::Request::notifyFromArray( $client,
-                    ['newmetadata'] )
-                  if $client;
-                1;
-            };
-
-            return;
+            _apply_metadata_update( $client, $url_clean, $cached );
         }
     }
+    else {
+        # Fetch metadata async
+        _fetch_plex_track_metadata(
+            sub {
+                my ($m) = @_;
+                return unless $m && ref($m) eq 'HASH';
 
-    # Fetch metadata async
-    _fetch_plex_track_metadata(
-        sub {
-            my ($m) = @_;
-            return unless $m && ref($m) eq 'HASH';
+                # Cache final LMS metadata
+                $cache->set( $metaKey, $m, 900 );    # TTL: 15 minutes
 
-            # setRemoteMetadata supports only certain fields
-            my $meta = {
-                title => _compose_title($m),
+                _apply_metadata_update( $client, $url_clean, $m );
+            },
+            $base,
+            $token,
+            $rk
+        );
+    }
+}
 
-                # seems to have no effect
-                year => $m->{year} || '',
+sub _apply_metadata_update {
+    my ( $client, $url, $m ) = @_;
 
-                # duration must be in "secs" (seconds, or hh:mm:ss string)
-                secs => $m->{duration} || 0,
+    return unless $m && ref($m) eq 'HASH';
 
-                # artwork URL
-                cover => $m->{cover} || $m->{icon}
-            };
+    # setRemoteMetadata supports only certain fields
+    my $meta = {
+        title => _compose_title($m),
 
-            # Cache final LMS metadata
-            $cache->set( $metaKey, $meta, 300 )
-              ;    # TTL: 5 minutes
+        # seems to have no effect
+        year => $m->{year} || '',
 
-            Slim::Music::Info::setRemoteMetadata( $url_clean, $meta );
+        # duration must be in "secs" (seconds, or hh:mm:ss string)
+        secs => $m->{duration} || 0,
 
-            # May the LMS gods forgive me for this ... 🙏
-            setMetadataForPlaylistItem(
-                $url_clean,     $m->{album}, $m->{disc},
-                $m->{tracknum}, $m->{year},  $m->{genre}
-            );
+        # artwork URL
+        cover => $m->{cover} || $m->{icon}
+    };
 
-            eval {
-                $client->currentPlaylistUpdateTime( Time::HiRes::time() )
-                  if $client;
-                Slim::Control::Request::notifyFromArray( $client,
-                    ['newmetadata'] )
-                  if $client;
-                1;
-            };
-        },
-        $base,
-        $token,
-        $rk
+    Slim::Music::Info::setRemoteMetadata( $url, $meta );
+
+    # May the LMS gods forgive me for this ... 🙏
+    setMetadataForPlaylistItem(
+        $url,           $m->{album}, $m->{disc},
+        $m->{tracknum}, $m->{year},  $m->{genre}
     );
+
+    eval {
+        $client->currentPlaylistUpdateTime( Time::HiRes::time() ) if $client;
+        Slim::Control::Request::notifyFromArray( $client, ['newmetadata'] )
+          if $client;
+        1;
+    };
 }
 
 sub setMetadataForPlaylistItem {
