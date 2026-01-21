@@ -28,7 +28,7 @@ While optional, this plugin is strongly recommended when using the [Squeeze Plex
 
 ---
 
-## ✨ Features
+## Features
 
 - Displays **Plex PMS metadata** in LMS
 - Automatically detects tracks loaded via **Squeeze Plex Hub**
@@ -36,7 +36,7 @@ While optional, this plugin is strongly recommended when using the [Squeeze Plex
 
 ---
 
-## 🔧 Requirements
+## Requirements
 
 - **Lyrion Music Server (LMS)**
 - **Squeeze Plex Hub** application
@@ -44,7 +44,7 @@ While optional, this plugin is strongly recommended when using the [Squeeze Plex
 
 ---
 
-## 🚀 Installation
+## Installation
 
 ### Manual Installation (Recommended for Development)
 
@@ -55,7 +55,7 @@ While optional, this plugin is strongly recommended when using the [Squeeze Plex
 
 ---
 
-## 🧑‍💻 Local Development
+## Local Development
 
 ### Unit Testing
 From repo root:
@@ -98,25 +98,25 @@ docker run --rm -it \
 I could LMS not to work properly with Docker Desktop (macOS) for development.
 Native Linux Docker is recommended for best results.
 
-## 🧠 How It Works
+## How It Works 🧠
 
 Squeeze Plex Hub loads tracks into LMS playlist
 The plugin detects those tracks
 Metadata is fetched from Plex Media Server
 LMS is updated in real-time with enriched metadata
 
-## 🤝 Contributing
+## Contributing 🤝
 
 Pull requests, bug reports, and feature ideas are welcome.
 If you enjoy extending LMS, Plex, or using legacy Squeezebox hardware with Plex — contributions or sponsorships are appreciated.
 
 👉 [GitHub Sponsors](https://github.com/sponsors/onmomo)
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License.
 
-## ⚠️ Disclaimer
+## Disclaimer
 
 **LMS Squeeze Plex Hub Plugin** is an independent, open source project and is **not affiliated with, endorsed by, or officially supported by Plex, Plexamp, Logitech, or Slim Devices**.  
 All product names and trademarks are the property of their respective owners.
