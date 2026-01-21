@@ -25,14 +25,6 @@ Slim::Player::ProtocolHandlers->registerURLHandler( SPH_URL_REGEXP,
     __PACKAGE__ )
   if Slim::Player::ProtocolHandlers->can('registerURLHandler');
 
-sub contentType     { 'sph' }
-sub canDirectStream { 0 }
-
-sub requestString {
-    my ( $class, $client, $url, $song ) = @_;
-    return $url;
-}
-
 # Keep the original URL in the playlist (so getMetadataFor keeps working).
 sub explodePlaylist {
     my ( $class, $client, $uri, $cb ) = @_;
@@ -42,7 +34,8 @@ sub explodePlaylist {
 
     unless ( defined $url_clean && $url_clean ne '' ) {
         $log->error(
-            "SPH explodePlaylist: clean URL is empty, returning original URI");
+"Transform URL for playlist items failed: clean URL is empty, returning original URI"
+        );
         $cb->( [$uri] );
         return;
     }
@@ -60,73 +53,69 @@ sub explodePlaylist {
 
     # Cache key per Plex track
     my $metaKey = "sph_meta_${base}_${rk}";
-
-    # Serve cached metadata if available
     if ( my $cached = $cache->get($metaKey) ) {
+
+        # Serve cached metadata if available
         if ( ref($cached) eq 'HASH' ) {
-            $log->info( "SPH: serving cached metadata for rk=$rk, title='"
+            $log->info( "Serving cached metadata for rk=$rk, title='"
                   . ( $cached->{title} || '' )
-                  . "'" );
-            Slim::Music::Info::setRemoteMetadata( $url_clean, $cached );
+                  . "'" );            
 
-            eval {
-                $client->currentPlaylistUpdateTime( Time::HiRes::time() )
-                  if $client;
-                Slim::Control::Request::notifyFromArray( $client,
-                    ['newmetadata'] )
-                  if $client;
-                1;
-            };
-
-            return;
+            _apply_metadata_update( $client, $url_clean, $cached );
         }
     }
+    else {
+        # Fetch metadata async
+        _fetch_plex_track_metadata(
+            sub {
+                my ($m) = @_;
+                return unless $m && ref($m) eq 'HASH';
 
-    # Fetch metadata async
-    _fetch_plex_track_metadata(
-        sub {
-            my ($m) = @_;
-            return unless $m && ref($m) eq 'HASH';
+                # Cache final LMS metadata
+                $cache->set( $metaKey, $m, 900 );    # TTL: 15 minutes
 
-            # setRemoteMetadata supports only certain fields
-            my $meta = {
-                title => _compose_title($m),
+                _apply_metadata_update( $client, $url_clean, $m );
+            },
+            $base,
+            $token,
+            $rk
+        );
+    }
+}
 
-                # seems to have no effect
-                year => $m->{year} || '',
+sub _apply_metadata_update {
+    my ( $client, $url, $m ) = @_;
 
-                # duration must be in "secs" (seconds, or hh:mm:ss string)
-                secs => $m->{duration} || 0,
+    return unless $m && ref($m) eq 'HASH';
 
-                # artwork URL
-                cover => $m->{cover} || $m->{icon}
-            };
+    # setRemoteMetadata supports only certain fields
+    my $meta = {
+        title => _compose_title($m),
 
-            # Cache final LMS metadata
-            $cache->set( $metaKey, $meta, 1800 )
-              ;    # TTL: 0.5 hours (tune as needed)
+        # seems to have no effect
+        year => $m->{year} || '',
 
-            Slim::Music::Info::setRemoteMetadata( $url_clean, $meta );
+        # duration must be in "secs" (seconds, or hh:mm:ss string)
+        secs => $m->{duration} || 0,
 
-            # May the LMS gods forgive me for this ... 🙏
-            setMetadataForPlaylistItem(
-                $url_clean,     $m->{album}, $m->{disc},
-                $m->{tracknum}, $m->{year},  $m->{genre}
-            );
+        # artwork URL
+        cover => $m->{cover} || $m->{icon}
+    };
 
-            eval {
-                $client->currentPlaylistUpdateTime( Time::HiRes::time() )
-                  if $client;
-                Slim::Control::Request::notifyFromArray( $client,
-                    ['newmetadata'] )
-                  if $client;
-                1;
-            };
-        },
-        $base,
-        $token,
-        $rk
+    Slim::Music::Info::setRemoteMetadata( $url, $meta );
+
+    # May the LMS gods forgive me for this ... 🙏
+    setMetadataForPlaylistItem(
+        $url,           $m->{album}, $m->{disc},
+        $m->{tracknum}, $m->{year},  $m->{genre}
     );
+
+    eval {
+        $client->currentPlaylistUpdateTime( Time::HiRes::time() ) if $client;
+        Slim::Control::Request::notifyFromArray( $client, ['newmetadata'] )
+          if $client;
+        1;
+    };
 }
 
 sub setMetadataForPlaylistItem {
@@ -166,7 +155,7 @@ sub _compose_title {
         $t = $title;
     }
 
-    $log->debug("SPH: composed title: '$t'");
+    $log->debug("Composed title: '$t'");
     return $t;
 }
 
@@ -208,7 +197,7 @@ sub _fetch_plex_track_metadata {
     # Mask token in log output
     my $metaUrlLog = $metaUrl;
     $metaUrlLog =~ s/(X-Plex-Token=)[^&]+/${1}REDACTED/ig;
-    $log->debug("SPH: fetching Plex metadata from URL: $metaUrlLog");
+    $log->debug("Fetching Plex metadata from URL: $metaUrlLog");
 
     my $http = Slim::Networking::SimpleAsyncHTTP->new(
         sub {
@@ -220,7 +209,7 @@ sub _fetch_plex_track_metadata {
                 $data = XMLin( $content, ForceArray => 1, KeyAttr => [] );
                 1;
             } or do {
-                $log->error("SPH: failed to parse Plex XML for rk=$rk: $@");
+                $log->error("Failed to parse Plex XML for rk=$rk: $@");
                 $cb->(undef);
                 return;
             };
@@ -292,7 +281,7 @@ sub _fetch_plex_track_metadata {
             my $iconLog = $icon || '';
             $iconLog =~ s/(X-Plex-Token=)[^&]+/${1}REDACTED/ig;
 
-            $log->debug( "SPH: fetched Plex metadata for rk=$rk: "
+            $log->debug( "Fetched Plex metadata for rk=$rk: "
                   . "title='$title', artist='$artist', album='$album', "
                   . "year='$year', duration=$duration, tracknum='$tracknum', disc='$disc', "
                   . "genre='$genre', icon='$iconLog'" );
@@ -314,7 +303,7 @@ sub _fetch_plex_track_metadata {
         },
         sub {
             my ($http) = @_;
-            $log->warn( "SPH: Plex metadata request failed for rk=$rk: "
+            $log->warn( "Plex metadata request failed for rk=$rk: "
                   . ( $http->error || 'unknown error' ) );
             $cb->(undef);
         },
