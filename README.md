@@ -40,7 +40,7 @@ While optional, this plugin is strongly recommended when using the [Squeeze Plex
 
 - **Lyrion Music Server (LMS)**
 - **Squeeze Plex Hub** application
-- **Plex Media Server** reachable from Squeeze Plex Hub
+- **Plex Media Server** reachable from Squeeze Plex Hub and Lyrion Music Server
 
 ---
 
