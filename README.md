@@ -55,7 +55,7 @@ While optional, this plugin is strongly recommended when using the [Squeeze Plex
 
 ---
 
-## Local Development
+## Local Development 🛠️
 
 ### Unit Testing
 From repo root:
@@ -75,7 +75,7 @@ ln -sv "$(pwd)/SqueezePlexHub/"* "/Users/$USER/Library/Application Support/Squee
 
 Restart LMS after linking.
 
-### 🐳 Docker (Development & Testing)
+### Docker (Development & Testing) 🐳
 
 You can run LMS in Docker and mount the plugin directly:
 
