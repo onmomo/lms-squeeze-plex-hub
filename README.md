@@ -38,8 +38,8 @@ While optional, this plugin is strongly recommended when using the [Squeeze Plex
 
 ## Requirements
 
-- **Lyrion Music Server (LMS)**
-- **Squeeze Plex Hub** application
+- **Lyrion Music Server (LMS)** with LMS Squeeze Plex Hub Plugin activated
+- **Squeeze Plex Hub** >= 1.22.0
 - **Plex Media Server** reachable from Squeeze Plex Hub and Lyrion Music Server
 
 ---
