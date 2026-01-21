@@ -46,10 +46,10 @@ While optional, this plugin is strongly recommended when using the [Squeeze Plex
 
 ## Installation
 
-### Manual Installation (Recommended for Development)
+### Manual Installation
 
 1. Clone this repository
-2. Ensure the plugin directory is named exactly:
+2. Ensure the plugin directory is named exactly: SqueezePlexHub
 3. Restart LMS after any change
    > LMS does **not** hot-reload plugins
 
@@ -70,7 +70,7 @@ Install the Lyrion Music Server DMG for macOS, then symlink the plugin into LMS:
 
 ```bash
 mkdir -p "/Users/$USER/Library/Application Support/Squeezebox/Plugins/SqueezePlexHub"
-ln -sv "$(pwd)/SqueezePlexHub/"* "/Users/$USER/Library/Application Support/Squeezebox/Plugins/SqueezePlexHub"
+ln -sv "$PWD/SqueezePlexHub/"* "/Users/$USER/Library/Application Support/Squeezebox/Plugins/SqueezePlexHub"
 ```
 
 Restart LMS after linking.
