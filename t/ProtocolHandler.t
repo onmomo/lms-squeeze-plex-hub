@@ -127,6 +127,7 @@ sub reset_state {
     is( scalar(@Slim::Music::Info::CALLS), 1, 'setRemoteMetadata called once' );
     is( $Slim::Music::Info::CALLS[0][1]{title},
         'CACHED', 'cached title applied' );
+    is( scalar(@Slim::Schema::UPDATE_CALLS), 1, 'updateOrCreate called once' );
 
     $cacheMock->unmock_all();
 }
@@ -200,7 +201,7 @@ sub reset_state {
     is( $Slim::Music::Info::CALLS[0][1]{secs}, 210, 'secs set' );
 
     ok( @$cacheSets >= 1, 'cache set called' );
-    is( $cacheSets->[0][2], 1800, 'cache ttl is 1800' );
+    is( $cacheSets->[0][2], 900, 'cache ttl is 900' );
 
     is( scalar(@Slim::Schema::UPDATE_CALLS), 1, 'updateOrCreate called once' );
     my $attrs = $Slim::Schema::UPDATE_CALLS[0]{attributes};

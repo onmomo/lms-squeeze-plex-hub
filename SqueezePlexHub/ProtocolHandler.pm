@@ -59,8 +59,7 @@ sub explodePlaylist {
         if ( ref($cached) eq 'HASH' ) {
             $log->info( "Serving cached metadata for rk=$rk, title='"
                   . ( $cached->{title} || '' )
-                  . "'" );
-            Slim::Music::Info::setRemoteMetadata( $url_clean, $cached );
+                  . "'" );            
 
             _apply_metadata_update( $client, $url_clean, $cached );
         }
