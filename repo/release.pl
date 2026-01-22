@@ -5,7 +5,6 @@ use strict;
 use warnings;
 
 use XML::Simple;
-use File::Basename;
 use Digest::SHA;
 
 my $repofile = $ARGV[0];
