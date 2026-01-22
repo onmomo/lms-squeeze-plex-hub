@@ -24,7 +24,7 @@ sub initPlugin {
 
     $class->SUPER::initPlugin();
 
-    $log->info('LMS Squeeze Plex Hub plugin initialized');
+    $log->info('Squeeze Plex Hub plugin initialized');
     return 1;
 }
 
