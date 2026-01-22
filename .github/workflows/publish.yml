@@ -1,0 +1,70 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine version
+        id: set-version
+        run: |
+          version=$(grep -E -o "version>(.*)</version" install.xml | grep -E -o "[0-9.]*")
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Create zip artifact
+        id: zip
+        run: |
+          zip -r LMS-SqueezePlexHub.zip SqueezePlexHub README.md
+
+      - name: Setup Perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: "5"
+
+      - name: Install Perl dependencies
+        run: |
+          cpanm --installdeps --notest .
+
+      - name: Update SHA and Version in repo.xml
+        id: update-repo
+        run: |
+          url="https://github.com/${{ github.repository }}/releases/download/v${{ steps.set-version.outputs.version }}"
+          perl repo/release.pl repo/repo.xml ${{ steps.set-version.outputs.version }} LMS-SqueezePlexHub.zip $url
+
+      - name: Commit repo.xml
+        id: commit-and-tag-repo
+        uses: EndBug/add-and-commit@v9
+        with:
+          author_name: github-actions
+          author_email: github-actions@github.com
+          message: Update repo.xml for release ${{ steps.set-version.outputs.version }}
+          add: repo/repo.xml
+          push: true
+          tag: v${{ steps.set-version.outputs.version }}
+
+      - name: Create GitHub Release
+        id: create-release-upload-assets
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: LMS-SqueezePlexHub.zip
+          name: LMS Squeeze Plex Hub Plugin (v${{ steps.set-version.outputs.version }})
+          tag_name: v${{ steps.set-version.outputs.version }}
+          generate_release_notes: true
+          draft: false
+          prerelease: false

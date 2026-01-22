@@ -1,5 +1,6 @@
 requires 'URI';
 requires 'XML::Simple';
+requires 'Digest::SHA';
 requires 'Devel::Cover';
 requires 'Devel::Cover::Report::Clover';
 
