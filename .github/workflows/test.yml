@@ -1,4 +1,4 @@
-name: lms-squeeze-plex-hub-plugin-tests
+name: Test & Coverage
 
 on:
   push:
