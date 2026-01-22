@@ -1,0 +1,84 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine version
+        id: set-version
+        run: |
+          version=$(egrep -o "version>(.*)</version" install.xml | egrep -o "[0-9.]*")
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Create zip artifact
+        id: zip
+        run: |
+          zip -r LMS-SqueezePlexHub.zip SqueezePlexHub README.md
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LMS-SqueezePlexHub
+          path: LMS-SqueezePlexHub.zip
+
+      - name: Setup Perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5'
+
+      - name: Install Perl dependencies
+        run: |
+          cpanm --quiet --notest XML::Simple Digest::SHA
+
+      - name: Update SHA and Version in repo.xml
+        id: tag
+        run: |
+          url="https://github.com/${{ github.repository }}/releases/download/${{ steps.set-version.outputs.version }}"
+          perl repo/release.pl repo/repo.xml ${{ steps.set-version.outputs.version }} LMS-SqueezePlexHub.zip $url
+
+      - name: Commit repo.xml
+        uses: EndBug/add-and-commit@v9
+        with:
+          author_name: github-actions
+          author_email: github-actions@github.com
+          message: Update repo.xml for release ${{ steps.set-version.outputs.version }}
+          add: repo/repo.xml
+          push: true
+          tag: v${{ steps.set-version.outputs.version }}
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.set-version.outputs.version }}
+          release_name: Version ${{ steps.set-version.outputs.version }}
+          body: LMS Squeeze Plex Hub Plugin release
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: LMS-SqueezePlexHub.zip
+          asset_name: LMS-SqueezePlexHub.zip
+          asset_content_type: application/zip
