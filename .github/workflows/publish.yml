@@ -48,7 +48,7 @@ jobs:
       - name: Update SHA and Version in repo.xml
         id: update-repo
         run: |
-          url="https://github.com/${{ github.repository }}/releases/download/${{ steps.set-version.outputs.version }}"
+          url="https://github.com/${{ github.repository }}/releases/download/v${{ steps.set-version.outputs.version }}"
           perl repo/release.pl repo/repo.xml ${{ steps.set-version.outputs.version }} LMS-SqueezePlexHub.zip $url
 
       - name: Commit repo.xml
@@ -68,7 +68,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.set-version.outputs.version }}
+          tag_name: v${{ steps.set-version.outputs.version }}
           release_name: Version ${{ steps.set-version.outputs.version }}
           body: LMS Squeeze Plex Hub Plugin release
           draft: false
