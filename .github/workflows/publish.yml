@@ -7,7 +7,7 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -22,7 +22,7 @@ jobs:
       - name: Determine version
         id: set-version
         run: |
-          version=$(grep -E -o "version>(.*)</version" install.xml | grep -E -o "[0-9.]*")
+          version=$(grep -E -o "version>(.*)</version" SqueezePlexHub/install.xml | grep -E -o "[0-9.]*")
           echo "version=$version" >> $GITHUB_OUTPUT
 
       - name: Create zip artifact
