@@ -1,15 +1,15 @@
 <?xml version='1.0' standalone='yes'?>
 <extensions>
   <plugins>
-    <plugin name="SqueezePlexHub" version="1.0.1" minTarget="8.0" maxTarget="*">
-      <url>https://github.com/onmomo/lms-squeeze-plex-hub/releases/download/v1.0.1/LMS-SqueezePlexHub.zip</url>
-      <link>https://github.com/onmomo/lms-squeeze-plex-hub</link>      
+    <plugin version="1.0.1" minTarget="8.0" name="SqueezePlexHub" maxTarget="*">
       <creator>Christian Moser</creator>
       <category>information</category>
-      <title lang="EN">Squeeze Plex Hub</title>
-      <sha>2bb666aa1753a1a8f7bca125d4c34eed7c7db130</sha>
       <desc lang="EN">A Lyrion Music Server plugin that bridges Plex metadata into LMS when tracks are streamed through the Squeeze Plex Hub application.</desc>
       <icon>https://github.com/onmomo/lms-squeeze-plex-hub/blob/develop/SqueezePlexHub/HTML/EN/plugins/SqueezePlexHub/html/images/logo.png?raw=true</icon>
+      <url>https://github.com/onmomo/lms-squeeze-plex-hub/releases/download/v1.0.1/LMS-SqueezePlexHub.zip</url>
+      <title lang="EN">Squeeze Plex Hub</title>
+      <sha>1bd6b1f58d3f1a5dbf13f0272045d9ca3a1c8b20</sha>
+      <link>https://github.com/onmomo/lms-squeeze-plex-hub</link>
     </plugin>
   </plugins>
 </extensions>
