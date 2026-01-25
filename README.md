@@ -46,11 +46,20 @@ While optional, this plugin is strongly recommended when using the [Squeeze Plex
 
 ## Installation
 
+1. Go to LMS server settings -> Manage plugins and search for "**Squeeze Plex Hub**". It should be listed in the 3rd party plugins section.
+2. Activate the plugin and restart.
+3. Use Squeeze Plex Hub to play some tracks, the metadata should be added automatically.
+
+If the plugin is not listed, add the following repository url in the **Additional Repositories** section and follow the installation instructions.
+
+* https://raw.githubusercontent.com/onmomo/lms-squeeze-plex-hub/refs/heads/develop/repo/repo.xml
+
 ### Manual Installation
 
 1. Clone this repository
-2. Ensure the plugin directory is named exactly: SqueezePlexHub
-3. Restart LMS after any change
+2. Mount the SqueezePlexHub directory into $LMS-ROOT-DIR/config/cache/Plugins
+3. Ensure the plugin directory is named exactly: SqueezePlexHub
+4. Restart LMS after any change
    > LMS does **not** hot-reload plugins
 
 ---
